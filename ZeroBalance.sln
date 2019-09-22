@@ -1,0 +1,23 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroBalance.Tests", "ZeroBalance.Tests\ZeroBalance.Tests.csproj", "{2216C26D-2873-4B4A-824C-D77E7DEE861C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroBalance", "ZeroBalance\ZeroBalance.csproj", "{E44DC334-33B0-4471-B32F-D004F364C2E7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2216C26D-2873-4B4A-824C-D77E7DEE861C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2216C26D-2873-4B4A-824C-D77E7DEE861C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2216C26D-2873-4B4A-824C-D77E7DEE861C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2216C26D-2873-4B4A-824C-D77E7DEE861C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E44DC334-33B0-4471-B32F-D004F364C2E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E44DC334-33B0-4471-B32F-D004F364C2E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E44DC334-33B0-4471-B32F-D004F364C2E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E44DC334-33B0-4471-B32F-D004F364C2E7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
