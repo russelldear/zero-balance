@@ -41,6 +41,7 @@
         public static class InvoiceStatus
         {
             public const string Authorised = "AUTHORISED";
+            public const string Submitted = "SUBMITTED";
         }
 
         public static class InvoiceType

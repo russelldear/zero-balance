@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using Newtonsoft.Json;
 using ZeroBalance.DataContracts;
@@ -139,7 +140,7 @@ namespace ZeroBalance.Services
         {
             HttpResponseMessage response = null;
 
-            var whereClause = $"where={HttpUtility.UrlEncode($"Type==\"{type}\"&&Status==\"{InvoiceStatus.Authorised}\"")}";
+            var whereClause = $"where={HttpUtility.UrlEncode($"Type==\"{type}\"&&(Status==\"{InvoiceStatus.Authorised}\"||Status==\"{InvoiceStatus.Submitted}\")")}";
 
             var invoiceUrl = $"{Settings.XeroBaseUrl}{ApiAccounting}{Endpoints.Invoices}?{whereClause}";
 
@@ -162,7 +163,7 @@ namespace ZeroBalance.Services
                 {
                     var invoicesResponseString = response.Content.ReadAsStringAsync().Result;
 
-                    //Console.WriteLine(invoicesResponseString);
+                    Console.WriteLine(Regex.Replace(invoicesResponseString, @"\r\n?|\n", " "));
 
                     return JsonConvert.DeserializeObject<XeroApiResponse>(invoicesResponseString).Invoices;
                 }
