@@ -7,6 +7,7 @@ namespace ZeroBalance.DataContracts
 
     public class Organisation
     {
+        public Guid OrganisationID { get; set; }
         public string Name { get; set; }
     }
 }

@@ -34,7 +34,12 @@ namespace ZeroBalance.Tests
 
             if (url.Contains("organisations"))
             {
-                result.Content = new StringContent("{ \"Organisations\":[ { \"name\": \"Something\" } ] }");
+                result.Content = new StringContent("{ \"Organisations\":[ { \"OrganisationID\": \"57d90938-314e-4296-9a62-5fb3dd79b2b9\", \"Name\": \"Something\" } ] }");
+            }
+
+            if (url.Contains("invoices"))
+            {
+                result.Content = new StringContent("{ \"Invoices\":[ { \"AmountDue\": \"123.45\" } ] }");
             }
 
             return result;

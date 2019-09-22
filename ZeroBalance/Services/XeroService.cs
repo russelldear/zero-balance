@@ -4,8 +4,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Web;
 using Newtonsoft.Json;
 using ZeroBalance.DataContracts;
+using static ZeroBalance.Constants;
 
 namespace ZeroBalance.Services
 {
@@ -25,9 +27,42 @@ namespace ZeroBalance.Services
 
         public string GetConnections()
         {
+            var organisations = GetOrganisations();
+
+            if (organisations.Count() > 0)
+            {
+                var responseBuilder = new StringBuilder("You have connected the following organisations to Zero Balance: ");
+
+                foreach (var organisation in organisations)
+                {
+                    responseBuilder.Append($"{organisation.Name}, ");
+                }
+
+                return responseBuilder.ToString();
+            }
+
+            return "Something went wrong. Please try again in a few minutes.";
+        }
+
+        public string GetBalances()
+        {
+            var organisations = GetOrganisations();
+
+            var combinedResponse = string.Empty;
+
+            foreach (var organisation in organisations)
+            {
+                combinedResponse = $"For organisation {organisation.Name}, {GetInvoicesBalance(organisation)} and {GetBillsBalance(organisation)}";
+            }
+
+            return combinedResponse;
+        }
+
+        private Organisations GetOrganisations()
+        {
             HttpResponseMessage response = null;
 
-            var connectionsUrl = $"{Settings.XeroBaseUrl}/connections";
+            var connectionsUrl = $"{Settings.XeroBaseUrl}{Endpoints.Connections}";
 
             try
             {
@@ -50,22 +85,22 @@ namespace ZeroBalance.Services
 
                     var connections = JsonConvert.DeserializeObject<Connections>(connectionsResponseString);
 
-                    var responseBuilder = new StringBuilder("You have connected the following organisations to Zero Balance: ");
+                    var organisations = new Organisations();
 
                     foreach (var connection in connections)
                     {
-                        var organisationsUrl = $"{Settings.XeroBaseUrl}/api.xro/2.0/organisations";
+                        var organisationsUrl = $"{Settings.XeroBaseUrl}{ApiAccounting}{Endpoints.Organisations}";
 
-                        response = _httpClient.Get(organisationsUrl, new Dictionary<string, string> { { "xero-tenant-id", $"{connection.TenantId}" } });
+                        response = _httpClient.Get(organisationsUrl, new Dictionary<string, string> { { Headers.XeroTenantId, $"{connection.TenantId}" } });
 
                         var apiResponseString = response.Content.ReadAsStringAsync().Result;
 
                         var apiResponse = JsonConvert.DeserializeObject<XeroApiResponse>(apiResponseString);
 
-                        responseBuilder.Append($"{apiResponse.Organisations.Single().Name}, ");
+                        organisations.AddRange(apiResponse.Organisations);
                     }
 
-                    return responseBuilder.ToString();
+                    return organisations;
                 }
                 else if (response.StatusCode == HttpStatusCode.Unauthorized)
                 {
@@ -73,7 +108,71 @@ namespace ZeroBalance.Services
                 }
             }
 
-            return "Something went wrong. Please try again in a few minutes.";
+            return null;
+        }
+
+        private string GetInvoicesBalance(Organisation organisation)
+        {
+            var invoices = GetInvoices(organisation, InvoiceType.Invoice);
+
+            if (invoices.Count() > 0)
+            {
+                return $"you have {invoices.Count()} outstanding invoices totalling {invoices.Sum(i => i.AmountDue)}";
+            }
+
+            return "you have no outstanding invoices";
+        }
+
+        private string GetBillsBalance(Organisation organisation)
+        {
+            var bills = GetInvoices(organisation, InvoiceType.Bill);
+
+            if (bills.Count() > 0)
+            {
+                return $"you have {bills.Count()} bills to pay totalling {bills.Sum(i => i.AmountDue)}";
+            }
+
+            return "you have no bills to pay";
+        }
+
+        private Invoices GetInvoices(Organisation organisation, string type)
+        {
+            HttpResponseMessage response = null;
+
+            var whereClause = $"where={HttpUtility.UrlEncode($"Type==\"{type}\"&&Status==\"{InvoiceStatus.Authorised}\"")}";
+
+            var invoiceUrl = $"{Settings.XeroBaseUrl}{ApiAccounting}{Endpoints.Invoices}?{whereClause}";
+
+            Console.WriteLine(invoiceUrl);
+
+            try
+            {
+                response = _httpClient.Get(invoiceUrl, new Dictionary<string, string> { { Headers.XeroTenantId, $"{organisation.OrganisationID}" } });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Invoices request failed: " + ex.Message);
+            }
+
+            if (response != null)
+            {
+                Console.WriteLine("Xero invoices request status: " + response.StatusCode);
+
+                if (response.StatusCode == HttpStatusCode.OK && response.Content != null)
+                {
+                    var invoicesResponseString = response.Content.ReadAsStringAsync().Result;
+
+                    //Console.WriteLine(invoicesResponseString);
+
+                    return JsonConvert.DeserializeObject<XeroApiResponse>(invoicesResponseString).Invoices;
+                }
+                else if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    throw new UnauthorisedException();
+                }
+            }
+
+            return null;
         }
     }
 }

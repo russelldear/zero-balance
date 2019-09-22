@@ -1,5 +1,4 @@
-﻿using System;
-namespace ZeroBalance
+﻿namespace ZeroBalance
 {
     public static class Constants
     {
@@ -7,6 +6,7 @@ namespace ZeroBalance
         public const string IntentRequest = "IntentRequest";
 
         public const string ConnectionsIntent = "ConnectionsIntent";
+        public const string BalancesIntent = "BalancesIntent";
         public const string VersionIntent = "VersionIntent";
         public const string HelpIntent = "AMAZON.HelpIntent";
         public const string StopIntent = "AMAZON.StopIntent";
@@ -19,9 +19,34 @@ namespace ZeroBalance
 
         public const string BaseUrlKey = "XeroBaseUrl";
 
+        public static class Headers
+        {
+            public const string XeroTenantId = "xero-tenant-id";
+        }
+
         public static class TenantTypes
         {
             public const string Organisation = "ORGANISATION";
+        }
+
+        public const string ApiAccounting = "/api.xro/2.0";
+
+        public static class Endpoints
+        {
+            public const string Connections = "/connections";
+            public const string Organisations = "/organisations";
+            public const string Invoices = "/invoices";
+        }
+
+        public static class InvoiceStatus
+        {
+            public const string Authorised = "AUTHORISED";
+        }
+
+        public static class InvoiceType
+        {
+            public const string Invoice = "ACCREC";
+            public const string Bill = "ACCPAY";
         }
     }
 }

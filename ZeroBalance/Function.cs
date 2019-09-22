@@ -61,6 +61,20 @@ namespace ZeroBalance
 
                     response.ShouldEndSession = true;
                 }
+                else if (intent == Constants.BalancesIntent)
+                {
+                    try
+                    {
+                        responseText = _xeroService.GetBalances();
+                    }
+                    catch (UnauthorisedException)
+                    {
+                        responseText = Constants.UnauthorisedResponse;
+                        response.Card = new LinkAccountCard();
+                    }
+
+                    response.ShouldEndSession = true;
+                }
                 else if (intent == Constants.VersionIntent)
                 {
                     responseText = $"Deployed version is {context.FunctionVersion}";

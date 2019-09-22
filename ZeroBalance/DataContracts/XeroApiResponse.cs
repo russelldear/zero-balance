@@ -3,5 +3,7 @@
     public class XeroApiResponse
     {
         public Organisations Organisations { get; set; }
+
+        public Invoices Invoices { get; set; }
     }
 }
