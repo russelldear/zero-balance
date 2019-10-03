@@ -85,6 +85,11 @@ namespace ZeroBalance
                     responseText = Constants.HelpRequestText;
                     response.ShouldEndSession = false;
                 }
+                else if (intent == Constants.FallbackIntent)
+                {
+                    responseText = Constants.FallbackText;
+                    response.ShouldEndSession = false;
+                }
                 else if (intent == Constants.StopIntent)
                 {
                     response.ShouldEndSession = true;

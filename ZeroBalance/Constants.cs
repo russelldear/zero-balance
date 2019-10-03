@@ -9,11 +9,13 @@
         public const string BalancesIntent = "BalancesIntent";
         public const string VersionIntent = "VersionIntent";
         public const string HelpIntent = "AMAZON.HelpIntent";
+        public const string FallbackIntent = "AMAZON.FallbackIntent";
         public const string StopIntent = "AMAZON.StopIntent";
         public const string CancelIntent = "AMAZON.CancelIntent";
 
         public const string DefaultLaunchRequestText = "Zero Balance gives you balances from your bank accounts in Xero. Would you like to hear details of your balances?";
         public const string HelpRequestText = "Zero Balance gives you balances from your bank accounts in Xero. Would you like to hear details of your balances?";
+        public const string FallbackText = "I'm not sure about that one. The Zero Balance skill gives you balances from your bank accounts in Xero. Would you like to hear details of your balances?";
 
         public const string UnauthorisedResponse = "You haven't authorised access to your Xero account. Use the Alexa app to link your account and access your Xero information.";
 
