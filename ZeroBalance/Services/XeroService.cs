@@ -118,7 +118,7 @@ namespace ZeroBalance.Services
 
             if (invoices.Count() > 0)
             {
-                return $"you have {invoices.Count()} outstanding invoices totalling {invoices.Sum(i => i.AmountDue)}";
+                return $"you have {invoices.Count()} outstanding invoices totalling ${invoices.Sum(i => i.AmountDue)}";
             }
 
             return "you have no outstanding invoices";
@@ -130,7 +130,7 @@ namespace ZeroBalance.Services
 
             if (bills.Count() > 0)
             {
-                return $"you have {bills.Count()} bills to pay totalling {bills.Sum(i => i.AmountDue)}";
+                return $"you have {bills.Count()} bills to pay totalling ${bills.Sum(i => i.AmountDue)}";
             }
 
             return "you have no bills to pay";
@@ -140,7 +140,7 @@ namespace ZeroBalance.Services
         {
             HttpResponseMessage response = null;
 
-            var whereClause = $"where={HttpUtility.UrlEncode($"Type==\"{type}\"&&(Status==\"{InvoiceStatus.Authorised}\"||Status==\"{InvoiceStatus.Submitted}\")")}";
+            var whereClause = $"where={HttpUtility.UrlEncode($"Type==\"{type}\"&&Status==\"{InvoiceStatus.Authorised}\"")}";
 
             var invoiceUrl = $"{Settings.XeroBaseUrl}{ApiAccounting}{Endpoints.Invoices}?{whereClause}";
 
