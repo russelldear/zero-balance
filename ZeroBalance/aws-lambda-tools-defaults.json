@@ -1,4 +1,10 @@
-﻿{
-  "configuration": "Debug",
-  "framework": "netcoreapp2.1",
+{
+  "profile": "default",
+  "region" : "us-east-1",
+  "configuration" : "Release",
+  "framework" : "netcoreapp2.1",
+  "function-runtime":"dotnetcore2.1",
+  "function-memory-size" : 512,
+  "function-timeout" : 15,
+  "function-handler" : "ZeroBalance::ZeroBalance.Function::FunctionHandler"
 }
