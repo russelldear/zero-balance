@@ -57,7 +57,7 @@ namespace ZeroBalance.Services
             {
                 _currencies = GetCurrencies(organisation);
 
-                combinedResponse = $"For organisation {organisation.Name}, {GetInvoicesBalance(organisation)} and {GetBillsBalance(organisation)}";
+                combinedResponse += $"For organisation {organisation.Name}, {GetInvoicesBalance(organisation)}; and {GetBillsBalance(organisation)}.";
             }
 
             return combinedResponse;

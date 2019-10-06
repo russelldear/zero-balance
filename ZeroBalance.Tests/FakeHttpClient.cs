@@ -31,7 +31,7 @@ namespace ZeroBalance.Tests
 
             if (url.Contains("connections"))
             {
-                result.Content = new StringContent("[ { \"id\": \"57d90938-314e-4296-9a62-5fb3dd79b2b9\", \"tenantId\":\"57d90938-314e-4296-9a62-5fb3dd79b2b9\", \"tenantType\":\"ORGANISATION\" } ]");
+                result.Content = new StringContent("[ { \"id\": \"57d90938-314e-4296-9a62-5fb3dd79b2b9\", \"tenantId\":\"57d90938-314e-4296-9a62-5fb3dd79b2b9\", \"tenantType\":\"ORGANISATION\" }, { \"id\": \"57d90938-314e-4296-9a62-5fb3dd79b2b9\", \"tenantId\":\"57d90938-314e-4296-9a62-5fb3dd79b2b8\", \"tenantType\":\"ORGANISATION\" } ]");
             }
 
             if (url.Contains("organisations"))
