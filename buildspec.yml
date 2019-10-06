@@ -1,0 +1,8 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+       - cd ZeroBalance
+       - dotnet tool install --global Amazon.Lambda.Tools --version 3.2.3
+       - dotnet lambda deploy-function ZeroBalance -function-role LambdaFullAccess
