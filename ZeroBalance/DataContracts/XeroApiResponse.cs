@@ -5,5 +5,7 @@
         public Organisations Organisations { get; set; }
 
         public Invoices Invoices { get; set; }
+
+        public Currencies Currencies { get; set; }
     }
 }

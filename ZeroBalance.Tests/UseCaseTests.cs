@@ -36,6 +36,8 @@ namespace ZeroBalance.Tests
             When_I_request_my_balances();
 
             Then_response_text_contains_this("For organisation");
+
+            Then_response_text_contains_this("Australian dollars");
         }
 
         private void Given_a_valid_connection()
