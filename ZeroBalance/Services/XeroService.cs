@@ -114,11 +114,13 @@ namespace ZeroBalance.Services
 
         private string GetInvoicesBalance(Organisation organisation)
         {
+            var currencies = GetCurrencies(organisation);
+
             var invoices = GetInvoices(organisation, InvoiceType.Invoice);
 
             if (invoices.Count() > 0)
             {
-                return $"you have {invoices.Count()} outstanding invoices totalling ${invoices.Sum(i => i.AmountDue)}";
+                return $"you have {invoices.Count()} outstanding invoices totalling ${invoices.Sum(i => i.AmountDue)} {currencies.First().Description}s";
             }
 
             return "you have no outstanding invoices";
@@ -126,11 +128,13 @@ namespace ZeroBalance.Services
 
         private string GetBillsBalance(Organisation organisation)
         {
+            var currencies = GetCurrencies(organisation);
+
             var bills = GetInvoices(organisation, InvoiceType.Bill);
 
             if (bills.Count() > 0)
             {
-                return $"you have {bills.Count()} bills to pay totalling ${bills.Sum(i => i.AmountDue)}";
+                return $"you have {bills.Count()} bills to pay totalling {bills.Sum(i => i.AmountDue)} {currencies.First().Description}s";
             }
 
             return "you have no bills to pay";
@@ -166,6 +170,42 @@ namespace ZeroBalance.Services
                     Console.WriteLine(Regex.Replace(invoicesResponseString, @"\r\n?|\n", " "));
 
                     return JsonConvert.DeserializeObject<XeroApiResponse>(invoicesResponseString).Invoices;
+                }
+                else if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    throw new UnauthorisedException();
+                }
+            }
+
+            return null;
+        }
+
+        private Currencies GetCurrencies(Organisation organisation)
+        {
+            HttpResponseMessage response = null;
+
+            var currencyUrl = $"{Settings.XeroBaseUrl}{ApiAccounting}{Endpoints.Currencies}";
+
+            try
+            {
+                response = _httpClient.Get(currencyUrl, new Dictionary<string, string> { { Headers.XeroTenantId, $"{organisation.OrganisationID}" } });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Currencies request failed: " + ex.Message);
+            }
+
+            if (response != null)
+            {
+                Console.WriteLine("Xero currencies request status: " + response.StatusCode);
+
+                if (response.StatusCode == HttpStatusCode.OK && response.Content != null)
+                {
+                    var currenciesResponseString = response.Content.ReadAsStringAsync().Result;
+
+                    Console.WriteLine(Regex.Replace(currenciesResponseString, @"\r\n?|\n", " "));
+
+                    return JsonConvert.DeserializeObject<XeroApiResponse>(currenciesResponseString).Currencies;
                 }
                 else if (response.StatusCode == HttpStatusCode.Unauthorized)
                 {

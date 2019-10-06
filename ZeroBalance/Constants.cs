@@ -38,6 +38,7 @@
             public const string Connections = "/connections";
             public const string Organisations = "/organisations";
             public const string Invoices = "/invoices";
+            public const string Currencies = "/currencies";
         }
 
         public static class InvoiceStatus
