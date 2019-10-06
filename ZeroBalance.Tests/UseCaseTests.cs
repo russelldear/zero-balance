@@ -6,7 +6,6 @@ using Slight.Alexa.Framework.Models.Requests.RequestTypes;
 using Slight.Alexa.Framework.Models.Responses;
 using ZeroBalance.Services;
 using Xunit;
-using System.Collections.Generic;
 
 namespace ZeroBalance.Tests
 {
@@ -40,6 +39,20 @@ namespace ZeroBalance.Tests
             Then_response_text_contains_this("Australian dollars");
         }
 
+        [Fact]
+        public void Valid_multicurrency_balances_are_returned()
+        {
+            Given_valid_multicurrency_balances();
+
+            When_I_request_my_balances();
+
+            Then_response_text_contains_this("For organisation");
+
+            Then_response_text_contains_this("Australian dollars");
+
+            Then_response_text_contains_this("Euros");
+        }
+
         private void Given_a_valid_connection()
         {
             _mockSkillRequest = new Mock<SkillRequest>();
@@ -47,7 +60,7 @@ namespace ZeroBalance.Tests
 
             _mockSkillRequest.Object.Session = new Session { User = new User() };
 
-            _fakeHttpClient = new FakeHttpClient(HttpStatusCode.OK);
+            _fakeHttpClient = new FakeHttpClient(HttpStatusCode.OK, false);
 
             _xeroService = new XeroService(_fakeHttpClient);
         }
@@ -59,7 +72,19 @@ namespace ZeroBalance.Tests
 
             _mockSkillRequest.Object.Session = new Session { User = new User() };
 
-            _fakeHttpClient = new FakeHttpClient(HttpStatusCode.OK);
+            _fakeHttpClient = new FakeHttpClient(HttpStatusCode.OK, false);
+
+            _xeroService = new XeroService(_fakeHttpClient);
+        }
+
+        private void Given_valid_multicurrency_balances()
+        {
+            _mockSkillRequest = new Mock<SkillRequest>();
+            _mockLambdaContext = new Mock<ILambdaContext>();
+
+            _mockSkillRequest.Object.Session = new Session { User = new User() };
+
+            _fakeHttpClient = new FakeHttpClient(HttpStatusCode.OK, true);
 
             _xeroService = new XeroService(_fakeHttpClient);
         }

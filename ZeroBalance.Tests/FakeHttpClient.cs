@@ -8,11 +8,13 @@ namespace ZeroBalance.Tests
 {
     public class FakeHttpClient : IHttpClient
     {
-        readonly HttpStatusCode _status;
+        private readonly HttpStatusCode _status;
+        private readonly bool _multicurrency;
 
-        public FakeHttpClient(HttpStatusCode status)
+        public FakeHttpClient(HttpStatusCode status, bool multicurrency)
         {
             _status = status;
+            _multicurrency = multicurrency;
         }
 
         public HttpResponseMessage Get(string url, Dictionary<string, string> headers)
@@ -37,14 +39,24 @@ namespace ZeroBalance.Tests
                 result.Content = new StringContent("{ \"Organisations\":[ { \"OrganisationID\": \"57d90938-314e-4296-9a62-5fb3dd79b2b9\", \"Name\": \"Something\" } ] }");
             }
 
-            if (url.Contains("invoices"))
-            {
-                result.Content = new StringContent("{ \"Invoices\":[ { \"AmountDue\": \"123.45\", \"CurrencyCode\": \"AUD\" } ] }");
-            }
-
             if (url.Contains("currencies"))
             {
-                result.Content = new StringContent("{ \"Currencies\":[ { \"Code\": \"AUD\", \"Description\": \"Australian dollars\" } ] }");
+                result.Content = new StringContent("{ \"Currencies\":[ { \"Code\": \"AUD\", \"Description\": \"Australian dollar\" }, { \"Code\": \"EUR\", \"Description\": \"Euro\" } ] }");
+            }
+
+            if (_multicurrency)
+            {
+                if (url.Contains("invoices"))
+                {
+                    result.Content = new StringContent("{ \"Invoices\":[ { \"AmountDue\": \"123.45\", \"CurrencyCode\": \"AUD\" }, { \"AmountDue\": \"123.45\", \"CurrencyCode\": \"EUR\" } ] }");
+                }
+            }
+            else
+            {
+                if (url.Contains("invoices"))
+                {
+                    result.Content = new StringContent("{ \"Invoices\":[ { \"AmountDue\": \"123.45\", \"CurrencyCode\": \"AUD\" } ] }");
+                }
             }
 
             return result;

@@ -17,6 +17,8 @@ namespace ZeroBalance.Services
         private readonly IHttpClient _httpClient;
         private readonly Settings Settings = new Settings();
 
+        private Currencies _currencies;
+
         public XeroService(string accessToken) : this(new XeroClient(accessToken))
         {
         }
@@ -53,6 +55,8 @@ namespace ZeroBalance.Services
 
             foreach (var organisation in organisations)
             {
+                _currencies = GetCurrencies(organisation);
+
                 combinedResponse = $"For organisation {organisation.Name}, {GetInvoicesBalance(organisation)} and {GetBillsBalance(organisation)}";
             }
 
@@ -114,21 +118,38 @@ namespace ZeroBalance.Services
 
         private string GetInvoicesBalance(Organisation organisation)
         {
-            var currencies = GetCurrencies(organisation);
-
             var invoicesByCurrency = GetInvoices(organisation, InvoiceType.Invoice);
 
             if (invoicesByCurrency.Count() > 0)
             {
-                var result = string.Empty;
-
-                foreach (var currency in invoicesByCurrency.Keys)
+                if (invoicesByCurrency.Count() == 1)
                 {
-                    var invoices = invoicesByCurrency[currency];
-
-                    result += $"you have {invoices.Count()} outstanding invoices, totalling {invoices.Sum(i => i.AmountDue)} {currencies.First().Description}s;";
+                    return $"you have {invoicesByCurrency.Single().Value.Count()} outstanding invoices, totalling {invoicesByCurrency.Single().Value.Sum(i => i.AmountDue)} {_currencies.First().Description}s";
                 }
-                return result;
+                else
+                {
+                    var result = $"you have {invoicesByCurrency.Sum(i => i.Value.Count())} outstanding invoices, comprising of ";
+
+                    var currencyCount = invoicesByCurrency.Keys.Count();
+
+                    var iteration = 1;
+
+                    foreach (var currency in invoicesByCurrency.Keys)
+                    {
+                        var invoices = invoicesByCurrency[currency];
+
+                        result += $"{invoices.Sum(i => i.AmountDue)} {currency}s,";
+
+                        if (iteration == currencyCount - 1)
+                        {
+                            result += " and ";
+                        }
+
+                        iteration++;
+                    }
+
+                    return result;
+                }
             }
 
             return "you have no outstanding invoices";
@@ -136,22 +157,38 @@ namespace ZeroBalance.Services
 
         private string GetBillsBalance(Organisation organisation)
         {
-            var currencies = GetCurrencies(organisation);
-
             var billsByCurrency = GetInvoices(organisation, InvoiceType.Bill);
 
             if (billsByCurrency.Count() > 0)
             {
-                var result = string.Empty;
-
-                foreach (var currency in billsByCurrency.Keys)
+                if (billsByCurrency.Count() == 1)
                 {
-                    var bills = billsByCurrency[currency];
-
-                    result += $"you have {bills.Count()} bills to pay, totalling {bills.Sum(i => i.AmountDue)} {currencies.First().Description}s;";
+                    return $"you have {billsByCurrency.Single().Value.Count()} bills to pay, totalling {billsByCurrency.Single().Value.Sum(i => i.AmountDue)} {_currencies.First().Description}s";
                 }
+                else
+                {
+                    var result = $"you have {billsByCurrency.Sum(b => b.Value.Count())} bills to pay, comprising of ";
 
-                return result;
+                    var currencyCount = billsByCurrency.Keys.Count();
+
+                    var iteration = 1;
+
+                    foreach (var currency in billsByCurrency.Keys)
+                    {
+                        var bills = billsByCurrency[currency];
+
+                        result += $"{bills.Sum(i => i.AmountDue)} {currency}s,";
+
+                        if (iteration == currencyCount - 1)
+                        {
+                            result += " and ";
+                        }
+
+                        iteration++;
+                    }
+
+                    return result;
+                }
             }
 
             return "you have no bills to pay";
@@ -203,9 +240,7 @@ namespace ZeroBalance.Services
         {
             var result = new Dictionary<string, IEnumerable<Invoice>>();
 
-            var currencies = GetCurrencies(organisation);
-
-            foreach (var currency in currencies)
+            foreach (var currency in _currencies)
             {
                 if (invoices.Any(i => i.CurrencyCode == currency.Code))
                 {
