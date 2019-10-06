@@ -116,11 +116,19 @@ namespace ZeroBalance.Services
         {
             var currencies = GetCurrencies(organisation);
 
-            var invoices = GetInvoices(organisation, InvoiceType.Invoice);
+            var invoicesByCurrency = GetInvoices(organisation, InvoiceType.Invoice);
 
-            if (invoices.Count() > 0)
+            if (invoicesByCurrency.Count() > 0)
             {
-                return $"you have {invoices.Count()} outstanding invoices totalling {invoices.Sum(i => i.AmountDue)} {currencies.First().Description}s";
+                var result = string.Empty;
+
+                foreach (var currency in invoicesByCurrency.Keys)
+                {
+                    var invoices = invoicesByCurrency[currency];
+
+                    result += $"you have {invoices.Count()} outstanding invoices, totalling {invoices.Sum(i => i.AmountDue)} {currencies.First().Description}s;";
+                }
+                return result;
             }
 
             return "you have no outstanding invoices";
@@ -130,17 +138,26 @@ namespace ZeroBalance.Services
         {
             var currencies = GetCurrencies(organisation);
 
-            var bills = GetInvoices(organisation, InvoiceType.Bill);
+            var billsByCurrency = GetInvoices(organisation, InvoiceType.Bill);
 
-            if (bills.Count() > 0)
+            if (billsByCurrency.Count() > 0)
             {
-                return $"you have {bills.Count()} bills to pay totalling {bills.Sum(i => i.AmountDue)} {currencies.First().Description}s";
+                var result = string.Empty;
+
+                foreach (var currency in billsByCurrency.Keys)
+                {
+                    var bills = billsByCurrency[currency];
+
+                    result += $"you have {bills.Count()} bills to pay, totalling {bills.Sum(i => i.AmountDue)} {currencies.First().Description}s;";
+                }
+
+                return result;
             }
 
             return "you have no bills to pay";
         }
 
-        private Invoices GetInvoices(Organisation organisation, string type)
+        private Dictionary<string, IEnumerable<Invoice>> GetInvoices(Organisation organisation, string type)
         {
             HttpResponseMessage response = null;
 
@@ -169,7 +186,9 @@ namespace ZeroBalance.Services
 
                     Console.WriteLine(Regex.Replace(invoicesResponseString, @"\r\n?|\n", " "));
 
-                    return JsonConvert.DeserializeObject<XeroApiResponse>(invoicesResponseString).Invoices;
+                    var invoices = JsonConvert.DeserializeObject<XeroApiResponse>(invoicesResponseString).Invoices;
+
+                    return GetInvoicesByCurrency(organisation, invoices);
                 }
                 else if (response.StatusCode == HttpStatusCode.Unauthorized)
                 {
@@ -178,6 +197,23 @@ namespace ZeroBalance.Services
             }
 
             return null;
+        }
+
+        private Dictionary<string, IEnumerable<Invoice>> GetInvoicesByCurrency(Organisation organisation, Invoices invoices)
+        {
+            var result = new Dictionary<string, IEnumerable<Invoice>>();
+
+            var currencies = GetCurrencies(organisation);
+
+            foreach (var currency in currencies)
+            {
+                if (invoices.Any(i => i.CurrencyCode == currency.Code))
+                {
+                    result.Add(currency.Description, invoices.Where(i => i.CurrencyCode == currency.Code).ToList());
+                }
+            }
+
+            return result;
         }
 
         private Currencies GetCurrencies(Organisation organisation)

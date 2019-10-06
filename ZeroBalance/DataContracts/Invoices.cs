@@ -7,5 +7,7 @@ namespace ZeroBalance.DataContracts
 	public class Invoice
 	{
 		public float AmountDue { get; set; }
-	}
+
+        public string CurrencyCode { get; set; }
+    }
 }

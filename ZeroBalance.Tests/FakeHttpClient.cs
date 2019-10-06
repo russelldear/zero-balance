@@ -39,7 +39,7 @@ namespace ZeroBalance.Tests
 
             if (url.Contains("invoices"))
             {
-                result.Content = new StringContent("{ \"Invoices\":[ { \"AmountDue\": \"123.45\" } ] }");
+                result.Content = new StringContent("{ \"Invoices\":[ { \"AmountDue\": \"123.45\", \"CurrencyCode\": \"AUD\" } ] }");
             }
 
             if (url.Contains("currencies"))
