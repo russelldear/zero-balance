@@ -21,6 +21,7 @@ namespace ZeroBalance.Services
                 {
                     client.DefaultRequestHeaders.Add("Authorization", "Bearer " + _accessToken);
                     client.DefaultRequestHeaders.Add("Accept", "application/json");
+                    client.DefaultRequestHeaders.Add("User-Agent", "ClientId-B8E35DF81CBA4CC49BEE2084E10D7298");
 
                     if (headers != null)
                     {
