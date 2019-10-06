@@ -120,7 +120,7 @@ namespace ZeroBalance.Services
 
             if (invoices.Count() > 0)
             {
-                return $"you have {invoices.Count()} outstanding invoices totalling ${invoices.Sum(i => i.AmountDue)} {currencies.First().Description}s";
+                return $"you have {invoices.Count()} outstanding invoices totalling {invoices.Sum(i => i.AmountDue)} {currencies.First().Description}s";
             }
 
             return "you have no outstanding invoices";
